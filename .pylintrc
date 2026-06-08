@@ -1,0 +1,47 @@
+[MAIN]
+# MicroPython-specific: machine, time.sleep_ms, time.ticks_ms etc
+extension-pkg-allow-list=
+
+[BASIC]
+# Allow short function names, snake_case, etc
+good-names=i,j,k,x,y,r,g,b,w,h,cx,cy,spi,dc,cs,rst,bl,irq
+
+[MISCELLANEOUS]
+# Don't require fixme notes
+notes=
+
+[TYPECHECK]
+# Ignore MicroPython modules that don't exist in CPython
+ignored-modules=machine
+# Ignore members that are MicroPython-specific
+ignored-classes= machine.Pin
+
+[VARIABLES]
+# Allow redefining names from outer scope (common in embedded)
+allow-redefining-global-like=yes
+
+[FORMAT]
+# Don't enforce line length for embedded code
+max-line-length=120
+
+[IMPORTS]
+# Don't require standard imports before third party
+allow-any-import-level=yes
+
+[SIMILARITIES]
+# Ignore similarities (embedded code is repetitive by nature)
+ignore-signatures=yes
+ignore-docstrings=yes
+
+[DESIGN]
+# Allow high number of arguments (embedded display functions need many)
+max-args=10
+
+[REFACTORING]
+# Allow broad exceptions in embedded (we catch everything)
+max-branches=30
+max-statements=100
+
+[STRING]
+# Don't check string formatting
+check-quote-consistency=no

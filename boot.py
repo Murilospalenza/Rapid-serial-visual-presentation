@@ -31,6 +31,7 @@ SPI_ID       = 1
 
 
 def _init_spi():
+    """Inicializa o barramento SPI para o display."""
     return machine.SPI(
         SPI_ID, baudrate=SPI_BAUDRATE,
         polarity=0, phase=0,
@@ -40,6 +41,7 @@ def _init_spi():
 
 
 def _init_pins():
+    """Configura pinos de controle (DC, CS, RST, BL)."""
     dc = machine.Pin(PIN_DC, machine.Pin.OUT)
     cs = machine.Pin(PIN_CS, machine.Pin.OUT)
     rst = machine.Pin(PIN_RST, machine.Pin.OUT)
@@ -50,6 +52,7 @@ def _init_pins():
 
 
 def _cmd(spi, dc, cs, c):
+    """Envia um comando de byte único para o display via SPI."""
     dc.value(0)
     cs.value(0)
     spi.write(bytes([c]))
@@ -57,6 +60,7 @@ def _cmd(spi, dc, cs, c):
 
 
 def _dat(spi, dc, cs, d):
+    """Envia dados para o display via SPI."""
     dc.value(1)
     cs.value(0)
     spi.write(d if isinstance(d, (bytes, bytearray)) else bytes([d]))
@@ -64,6 +68,7 @@ def _dat(spi, dc, cs, d):
 
 
 def _hard_reset(rst):
+    """Executa reset físico do display via pino RST."""
     rst.value(0)
     time.sleep_ms(50)
     rst.value(1)
@@ -71,15 +76,16 @@ def _hard_reset(rst):
 
 
 def _init_display(spi, dc, cs):
-    _cmd(spi, dc, cs, 0x01)
+    """Sequência de inicialização ILI9341/ST7789 (Software Reset, Sleep Out, Pixel Format, Display ON)."""
+    _cmd(spi, dc, cs, 0x01)  # Software Reset
     time.sleep_ms(100)
-    _cmd(spi, dc, cs, 0x11)
+    _cmd(spi, dc, cs, 0x11)  # Sleep Out
     time.sleep_ms(100)
-    _cmd(spi, dc, cs, 0x3A)
-    _dat(spi, dc, cs, 0x55)   # RGB565 16-bit
-    _cmd(spi, dc, cs, 0x36)
-    _dat(spi, dc, cs, 0x08)   # BGR=1
-    _cmd(spi, dc, cs, 0x29)
+    _cmd(spi, dc, cs, 0x3A)  # Interface Pixel Format
+    _dat(spi, dc, cs, 0x55)  # RGB565 16-bit
+    _cmd(spi, dc, cs, 0x36)  # Memory Access Control
+    _dat(spi, dc, cs, 0x08)  # BGR=1
+    _cmd(spi, dc, cs, 0x29)  # Display ON
     time.sleep_ms(50)
 
 
@@ -89,6 +95,7 @@ class Display:
     """Abstração do display SPI com operações básicas."""
 
     def __init__(self, spi, dc, cs):
+        """Inicializa wrapper do display com objetos SPI e pinos."""
         self.spi = spi
         self.dc = dc
         self.cs = cs
@@ -96,9 +103,11 @@ class Display:
         self.height = HEIGHT
 
     def cmd(self, c):
+        """Envia comando para o display."""
         _cmd(self.spi, self.dc, self.cs, c)
 
     def dat(self, d):
+        """Envia dados para o display."""
         _dat(self.spi, self.dc, self.cs, d)
 
     def fill(self, r, g, b):
