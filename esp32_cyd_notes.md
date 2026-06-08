@@ -20,6 +20,56 @@
 - Conexão: **SPI** (display + touch compartilham o mesmo barramento SPI)
 - Backlight funcional (pino BL)
 
+## Alimentação e Bateria
+
+O CYD **NÃO tem circuito de bateria onboard** — não tem conector JST, não tem carregador, não tem step-up. A alimentação é exclusivamente via USB.
+
+### Opções de Alimentação
+
+| Opção | Como | Vantagem | Desvantagem |
+|-------|------|----------|-------------|
+| **USB direto** | Cabo micro-USB no computador ou carregador 5V/1A | Mais simples, já testado | Fica preso no cabo |
+| **Power bank** | Power bank 5V → USB do CYD | Portátil, fácil | Power bank é maior que o CYD |
+| **Bateria LiPo 18650 + TP4056 + Step-up** | Bateria 3.7V → TP4056 (carrega) → Step-up 5V → USB CYD | Barato (~R\$20), pequeno | Precisa soldar |
+| **Bateria LiPo 3.7V direto no 5V** | **NÃO RECOMENDADO** — 3.7V não é suficiente para o regulador 5V | — | Placa não liga ou fica instável |
+
+### Circuito recomendado para bateria
+
+```
+Bateria LiPo 18650 (3.7V)
+    │
+    ├── TP4056 (módulo carregador USB-C)
+    │   └── Carrega via USB quando disponível
+    │
+    └── MT3608 (step-up boost conversor)
+        └── 3.7V → 5V / 1A
+            │
+            └── Pino 5V do CYD (ou conector USB)
+```
+
+- **TP4056**: módulo de carregamento de LiPo (R\$3-5 no Mercado Livre)
+- **MT3608**: step-up boost que eleva 3.7V para 5V (R\$5-8)
+- **Bateria 18650**: 3.7V, 2000-3000mAh (R\$20-30)
+- **Autonomia estimada**: ~10-15 horas (CYD consome ~80mA com display ligado, ~150mA com Wi-Fi)
+- Com **deep sleep** (~10µA): meses
+
+### ⚠️ Importante
+
+- **Nunca** conecte bateria LiPo diretamente sem proteção (TP4056) — risco de explosão
+- **Nunca** conecte 5V no pino 3.3V — queima o ESP32
+- **I2C não serve para alimentação** — I2C é um barramento de dados (SDA/SCL), não fornece energia
+- O CYD tem um **regulador AMS1117-3.3** onboard que converte 5V USB para 3.3V. A entrada dele é o pino **5V** (ou USB)
+
+### Consumo estimado
+
+| Modo | Consumo | Autonomia com 18650 (2500mAh) |
+|------|---------|------------------------------|
+| Display ligado, sem Wi-Fi | ~80mA | ~31 horas |
+| Display ligado, lendo RSVP | ~80mA | ~31 horas |
+| Display ligado, com Wi-Fi | ~150-200mA | ~12-16 horas |
+| Deep sleep (backlight OFF) | ~10µA | ~28 anos (teórico) |
+| Desligado (sem bateria) | 0 | — |
+
 ## Pinagem Atual (confirmada no HW real)
 
 ### Display SPI
