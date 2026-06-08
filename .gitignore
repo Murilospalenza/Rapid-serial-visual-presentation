@@ -1,0 +1,25 @@
+# Ignorar o projeto RSVP Nano clonado (C++/PlatformIO)
+rsvpnano/
+
+# MicroPython - arquivos gerados
+.pyboard/
+.micropico/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
